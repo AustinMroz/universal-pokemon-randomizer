@@ -1,0 +1,169 @@
+package com.dabomstew.pkrandom;
+/*
+ * Randomize the type matchup chart
+ * Special thanks to coolboyman for his post on the format of the type chart:
+ * https://www.pokecommunity.com/showthread.php?t=83674
+ *
+ * Known offsets
+ * Red and Blue: 3E474
+ * Yellow: 3E62D
+ * Gold and Silver: 34D01
+ * Crystal: 34BB1
+ * Ruby: 1F9720
+ * Sapphire: 1F96B0
+ * Emerald: 31ACE8
+ * Fire Red: 24F050
+ * Leaf Green: 24F02C
+ * Diamond: 1DE1B8
+ * Platinum  23AD94 - 23AEE1
+ *
+ * There seems to be little space for expanding the number of matchups
+ * In order to both put a limit on the amount of matchups generated and
+ * limit the complexity, the current implementation uses a markov approach
+ */
+import java.util.Random;
+import java.util.Arrays;
+
+public class RandomTypeMatchups {
+   public int basetypes[] = {0x00, 0x05, 0x05, 0x00, 0x08, 0x05, 0x0a, 0x0a, 0x05,
+       0x0a, 0x0b, 0x05, 0x0a, 0x0c, 0x14, 0x0a, 0x0f, 0x14, 0x0a, 0x06, 0x14,
+       0x0a, 0x05, 0x05, 0x0a, 0x10, 0x05, 0x0a, 0x08, 0x14, 0x0b, 0x0a, 0x14,
+       0x0b, 0x0b, 0x05, 0x0b, 0x0c, 0x05, 0x0b, 0x04, 0x14, 0x0b, 0x05, 0x14,
+       0x0b, 0x10, 0x05, 0x0d, 0x0b, 0x14, 0x0d, 0x0d, 0x05, 0x0d, 0x0c, 0x05,
+       0x0d, 0x04, 0x00, 0x0d, 0x02, 0x14, 0x0d, 0x10, 0x05, 0x0c, 0x0a, 0x05,
+       0x0c, 0x0b, 0x14, 0x0c, 0x0c, 0x05, 0x0c, 0x03, 0x05, 0x0c, 0x04, 0x14,
+       0x0c, 0x02, 0x05, 0x0c, 0x06, 0x05, 0x0c, 0x05, 0x14, 0x0c, 0x10, 0x05,
+       0x0c, 0x08, 0x05, 0x0f, 0x0b, 0x05, 0x0f, 0x0c, 0x14, 0x0f, 0x0f, 0x05,
+       0x0f, 0x04, 0x14, 0x0f, 0x02, 0x14, 0x0f, 0x10, 0x14, 0x0f, 0x08, 0x05,
+       0x0f, 0x0a, 0x05, 0x01, 0x00, 0x14, 0x01, 0x0f, 0x14, 0x01, 0x03, 0x05,
+       0x01, 0x02, 0x05, 0x01, 0x0e, 0x05, 0x01, 0x06, 0x05, 0x01, 0x05, 0x14,
+       0x01, 0x11, 0x14, 0x01, 0x08, 0x14, 0x03, 0x0c, 0x14, 0x03, 0x03, 0x05,
+       0x03, 0x04, 0x05, 0x03, 0x05, 0x05, 0x03, 0x07, 0x05, 0x03, 0x08, 0x00,
+       0x04, 0x0a, 0x14, 0x04, 0x0d, 0x14, 0x04, 0x0c, 0x05, 0x04, 0x03, 0x14,
+       0x04, 0x02, 0x00, 0x04, 0x06, 0x05, 0x04, 0x05, 0x14, 0x04, 0x08, 0x14,
+       0x02, 0x0d, 0x05, 0x02, 0x0c, 0x14, 0x02, 0x01, 0x14, 0x02, 0x06, 0x14,
+       0x02, 0x05, 0x05, 0x02, 0x08, 0x05, 0x0e, 0x01, 0x14, 0x0e, 0x03, 0x14,
+       0x0e, 0x0e, 0x05, 0x0e, 0x11, 0x00, 0x0e, 0x08, 0x05, 0x06, 0x0a, 0x05,
+       0x06, 0x0c, 0x14, 0x06, 0x01, 0x05, 0x06, 0x03, 0x05, 0x06, 0x02, 0x05,
+       0x06, 0x0e, 0x14, 0x06, 0x07, 0x05, 0x06, 0x11, 0x14, 0x06, 0x08, 0x05,
+       0x05, 0x0a, 0x14, 0x05, 0x0f, 0x14, 0x05, 0x01, 0x05, 0x05, 0x04, 0x05,
+       0x05, 0x02, 0x14, 0x05, 0x06, 0x14, 0x05, 0x08, 0x05, 0x07, 0x00, 0x00,
+       0x07, 0x0e, 0x14, 0x07, 0x11, 0x05, 0x07, 0x08, 0x05, 0x07, 0x07, 0x14,
+       0x10, 0x10, 0x14, 0x10, 0x08, 0x05, 0x11, 0x01, 0x05, 0x11, 0x0e, 0x14,
+       0x11, 0x07, 0x14, 0x11, 0x11, 0x05, 0x11, 0x08, 0x05, 0x08, 0x0a, 0x05,
+       0x08, 0x0b, 0x05, 0x08, 0x0d, 0x05, 0x08, 0x0f, 0x14, 0x08, 0x05, 0x14,
+       0x08, 0x08, 0x05,       0x00, 0x07, 0x00, 0x01, 0x07, 0x00};
+   private String types[] = {"Normal", "Fighting", "Flying", "Poison", "Ground",
+      "Rock", "Bug", "Ghost", "Steel", "Fire", "Water", "Grass", "Electric",
+      "Psychic", "Ice", "Dragon", "Dark"};
+   private String types_abr[] = {"nor", "fig", "fly", "poi", "gro", "roc",
+      "bug", "gho", "ste", "fir", "wat", "gra", "ele", "psy", "ice", "dra", "dar"};
+   private int type_table[] = {0,1,2,3,4,5,6,7,8,-1,9,10,11,12,13,14,15,16};
+   private int type_LUT[] = {0,1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17};
+   private int effec_table[] = {0, 5, 20};
+   private double deviation = .2;
+   Random r;
+   public RandomTypeMatchups(Random r) {
+      this.r = r;
+   }
+   private RandomTypeMatchups() {
+      this.r = new java.util.Random();
+   }
+
+   public int[] randomTypes() {
+      //compute base distribution
+      int[][][] count = {{new int[17], new int[17], new int[17]},
+                        {new int[17], new int[17], new int[17]}};
+      int[] effec_sum = new int[3];
+      for(int i=0; i<basetypes.length; i+=3) {
+         int mult = basetypes[i+2];
+         int mult_index = 0;
+         if (mult >= 20)
+            mult_index = 2;
+         else if (mult >= 5)
+            mult_index = 1;
+
+         effec_sum[mult_index]++;
+         count[0][mult_index][type_table[basetypes[i]]]+=1;
+         count[1][mult_index][type_table[basetypes[i+1]]]+=1;
+      }
+      //actually generate new matchups
+      int[] matchups = new int[basetypes.length];
+outerloop:
+      for(int i=0;i<basetypes.length;i+=3) {
+         int effi = pickWeighted(effec_sum);
+         int ai = pickWeighted(count[0][effi]);
+         int at = type_LUT[ai];
+         int di = pickWeighted(count[1][effi]);
+         int dt = type_LUT[di];
+         int eff = effec_table[effi];
+
+         //Check and retry duplicates
+         //Currently makes randomTypes() O(n^2), consider improved implementation.
+         for(int x=0;x<i;x+=3) {
+            if (matchups[x] == at && matchups[x+1] == dt) {
+               //count[0][effi][ai]++;
+               //count[1][effi][di]++;
+               //effec_sum[effi]++;
+               i-=3;
+               continue outerloop;
+            }
+         }
+         matchups[i] = at;
+         matchups[i+1] = dt;
+         matchups[i+2] = eff;
+      }
+      return matchups;
+   }
+   public int pickWeighted(int[] sums) {
+      int sum_of_sums = 0;
+      for(int i = 0; i < sums.length; i++) {
+         sum_of_sums+=sums[i];
+      }
+      if(sum_of_sums < 0) {
+         //occurs when a type effectiveness is picked too many times
+         //In this case, weighting no longer matters
+         sum_of_sums = 0;
+      }
+      double step = sum_of_sums*deviation/sums.length;
+      double p = r.nextDouble()*sum_of_sums*(1+deviation);
+      for(int i=0;i<sums.length;i++) {
+         if(p <= sums[i]+step) {
+            //sums[i]--;
+            return i;
+         }
+         //TODO: double check correctness when sums[i]+deviation < 0
+         //if(sums[i]+step<0)
+           // System.err.println("Warning, sum+step is negative");
+         p -= (sums[i]+step);
+      }
+      System.err.printf("Failed to find element with p of %f remaining\n",p);
+      return sums.length-1;
+   }
+   private char effec_char[] = {' ','0','-','+'};
+   public String formatChart(int[] matchups) {
+      String out="    ";
+      int dim = 17;
+      int table[] = new int[dim*dim];
+      for(int i=0; i<matchups.length; i+=3) {
+         int mult = matchups[i+2];
+         int mult_index = 0;
+         if (mult >= 20)
+            mult_index = 2;
+         else if (mult >= 5)
+            mult_index = 1;
+         table[type_table[matchups[i]]*dim+type_table[matchups[i+1]]]=mult_index+1;
+      }
+      for(int i=0;i<17;i++)
+         out+=types_abr[i]+' ';
+      for(int r=0; r<17;r++) {
+         out+='\n'+types_abr[r];
+         for(int c=0; c<17;c++) {
+            out+="   "+effec_char[table[r*17+c]];
+         }
+      }
+      return out;
+   }
+}
+
+
