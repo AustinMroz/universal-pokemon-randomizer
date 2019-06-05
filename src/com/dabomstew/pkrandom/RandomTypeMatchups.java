@@ -1,4 +1,3 @@
-package com.dabomstew.pkrandom;
 /*
  * Randomize the type matchup chart
  * Special thanks to coolboyman for his post on the format of the type chart:
@@ -23,6 +22,8 @@ package com.dabomstew.pkrandom;
  */
 import java.util.Random;
 import java.util.Arrays;
+import java.util.Scanner;
+import java.io.RandomAccessFile;
 
 public class RandomTypeMatchups {
    public int basetypes[] = {0x00, 0x05, 0x05, 0x00, 0x08, 0x05, 0x0a, 0x0a, 0x05,
@@ -88,13 +89,13 @@ public class RandomTypeMatchups {
          count[1][mult_index][type_table[basetypes[i+1]]]+=1;
       }
       //actually generate new matchups
-      int[] matchups = new int[basetypes.length];
+      int[] matchups = new int[basetypes.length+3];
 outerloop:
       for(int i=0;i<basetypes.length;i+=3) {
-         int effi = pickWeighted(effec_sum);
-         int ai = pickWeighted(count[0][effi]);
+         int effi = pickWeighted(effec_sum, deviation/5);
+         int ai = pickWeighted(count[0][effi], deviation);
          int at = type_LUT[ai];
-         int di = pickWeighted(count[1][effi]);
+         int di = pickWeighted(count[1][effi], deviation);
          int dt = type_LUT[di];
          int eff = effec_table[effi];
 
@@ -113,9 +114,24 @@ outerloop:
          matchups[i+1] = dt;
          matchups[i+2] = eff;
       }
+      //Adjust ghost for foresight;
+      int end = basetypes.length;
+      for(int i=0;i<end;i++) {
+         if (matchups[i+2] == 0 && matchups[i+1] == 7) {
+            System.arraycopy(matchups, i, matchups, end, 3);
+            end -= 3;
+            System.arraycopy(matchups, end, matchups, i, 3);
+            i -= 3;
+         }
+      }
+      if(end == basetypes.length)
+         System.err.println("Warning, no ghost immunities generated. Foresight may break");
+      matchups[end] = 0xFE;
+      matchups[end+1] = 0xFE;
+      matchups[end+2] = 0x00;
       return matchups;
    }
-   public int pickWeighted(int[] sums) {
+   public int pickWeighted(int[] sums, double deviation) {
       int sum_of_sums = 0;
       for(int i = 0; i < sums.length; i++) {
          sum_of_sums+=sums[i];
@@ -146,6 +162,8 @@ outerloop:
       int dim = 17;
       int table[] = new int[dim*dim];
       for(int i=0; i<matchups.length; i+=3) {
+         if(matchups[i] == 0xFE && matchups[i+1] == 0xFE)
+            continue;
          int mult = matchups[i+2];
          int mult_index = 0;
          if (mult >= 20)
@@ -163,6 +181,38 @@ outerloop:
          }
       }
       return out;
+   }
+   private static byte[] platinum_sig = {0x50, 0x4f, 0x4b, 0x45, 0x4d, 0x4f,
+           0x4e, 0x20, 0x50, 0x4c, 0x00, 0x00, 0x43, 0x50, 0x55, 0x45};
+   public static void main(String[] args) throws Exception {
+      Scanner s = new Scanner(System.in);
+      String file_name = "";
+      if(args.length>=1)
+         file_name = args[0];
+      else {
+         System.out.print("Enter the Filename: ");
+         file_name = s.nextLine();
+      }
+      RandomAccessFile f = new RandomAccessFile(file_name, "rw");
+      byte[] sig = new byte[platinum_sig.length];
+      f.readFully(sig);
+      for(int i=0;i<platinum_sig.length;i++) {
+         if(platinum_sig[i] != sig[i]) {
+            System.err.println("Invalid signiture");
+         }
+      }
+      RandomTypeMatchups rtm = new RandomTypeMatchups(new Random());
+      int[] new_matchups = rtm.randomTypes();
+      System.out.println(rtm.formatChart(new_matchups));
+      byte[] matchups_byte = new byte[new_matchups.length];
+      for(int i=0;i<new_matchups.length;i++) {
+         matchups_byte[i] = (byte)new_matchups[i];
+      }
+      f.seek(0x23AD94);
+      f.write(matchups_byte);
+      f.close();
+      System.out.println("Press any key to close");
+      s.next();
    }
 }
 
