@@ -1941,11 +1941,9 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
         try {
             int overlay_number = romEntry.getInt("TypeChartOvlNumber");
             byte[] overlay = readOverlay(overlay_number);
-            //TODO: store in config?
             int tableOffset = romEntry.getInt("TypeChartOffset");
             int n=tableOffset;
             while(n+3<overlay.length) {
-                System.out.println(overlay[n]);
                 if(overlay[n] == -1 && overlay[n+1] == -1)
                     break;
                 n+=3;

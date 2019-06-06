@@ -45,6 +45,7 @@ import java.util.zip.CRC32;
 import com.dabomstew.pkrandom.FileFunctions;
 import com.dabomstew.pkrandom.GFXFunctions;
 import com.dabomstew.pkrandom.MiscTweak;
+import com.dabomstew.pkrandom.RandomTypeMatchups;
 import com.dabomstew.pkrandom.RomFunctions;
 import com.dabomstew.pkrandom.constants.Gen3Constants;
 import com.dabomstew.pkrandom.constants.GlobalConstants;
@@ -63,6 +64,7 @@ import com.dabomstew.pkrandom.pokemon.Pokemon;
 import com.dabomstew.pkrandom.pokemon.Trainer;
 import com.dabomstew.pkrandom.pokemon.TrainerPokemon;
 import compressors.DSDecmp;
+import java.io.IOException;
 
 public class Gen3RomHandler extends AbstractGBRomHandler {
 
@@ -3099,5 +3101,36 @@ public class Gen3RomHandler extends AbstractGBRomHandler {
         // Make image, 4bpp
         BufferedImage bim = GFXFunctions.drawTiledImage(trueFrontSprite, convPalette, 64, 64, 4);
         return bim;
+    }
+    @Override
+    public boolean canRandomizeMatchups() {
+        return romEntry.entries.containsKey("TypeChartOffset");
+    }
+    @Override
+    public void randomizeMatchups(final PrintStream log) {
+        int tableOffset = romEntry.getValue("TypeChartOffset");
+        int n = tableOffset;
+        while (n + 3 < rom.length) {
+            if (rom[n] == -1 && rom[n + 1] == -1) {
+                break;
+            }
+            n += 3;
+        }
+        if (rom[n] != -1) {
+            log.println("Failed to find end of existing type table");
+            return;
+        }
+        int len = n - tableOffset;
+        byte[] original_table = new byte[len];
+        System.arraycopy(rom, tableOffset, original_table, 0, len);
+        //TODO: refactor to feed in original_table
+        //With some finagling, this would cleanly solve the problem of 
+        //reindexing types between generations
+        //Perhaps have foresight remove immunities from the
+        //type with the most immunities?
+        RandomTypeMatchups rtm = new RandomTypeMatchups(this.random);
+        byte matchups[] = rtm.randomTypes();
+        log.println(rtm.formatChart(matchups));
+        System.arraycopy(matchups, 0, rom, tableOffset, matchups.length);
     }
 }

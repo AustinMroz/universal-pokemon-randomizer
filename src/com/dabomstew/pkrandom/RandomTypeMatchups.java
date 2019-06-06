@@ -99,7 +99,13 @@ outerloop:
          int di = pickWeighted(count[1][effi], deviation);
          byte dt = type_LUT[di];
          byte eff = effec_table[effi];
-
+         //Normal v Normal immunity is likely to show up since normal is one
+         //of the few types with both attacking and defending immunity
+         //It also feels really bad in early game, so it's forcebly prevented
+         if(matchups[i] == 0 && matchups[i+1] == 0) {
+             i-=3;
+             continue;
+         }
          //Check and retry duplicates
          //Currently makes randomTypes() O(n^2), consider improved implementation.
          for(int x=0;x<i;x+=3) {
