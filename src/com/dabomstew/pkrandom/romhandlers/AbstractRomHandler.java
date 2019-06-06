@@ -3647,6 +3647,15 @@ public abstract class AbstractRomHandler implements RomHandler {
     public boolean canChangeStarters() {
         return true;
     }
+    @Override
+    public boolean canRandomizeMatchups() {
+       return false;
+    }
+    @Override
+    public void randomizeMatchups(final PrintStream log) {
+       log.println("Randomizing types is unsupported for this game");
+    }
+
 
     @Override
     public boolean typeInGame(Type type) {

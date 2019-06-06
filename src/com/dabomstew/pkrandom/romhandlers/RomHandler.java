@@ -229,6 +229,10 @@ public interface RomHandler {
 
     public boolean canChangeStaticPokemon();
 
+    public boolean canRandomizeMatchups();
+    
+    public void randomizeMatchups(final PrintStream log);
+
     public List<Pokemon> bannedForStaticPokemon();
 
     // Randomizer: TMs/HMs

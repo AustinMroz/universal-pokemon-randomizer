@@ -1,3 +1,4 @@
+package com.dabomstew.pkrandom;
 /*
  * Randomize the type matchup chart
  * Special thanks to coolboyman for his post on the format of the type chart:
@@ -26,7 +27,7 @@ import java.util.Scanner;
 import java.io.RandomAccessFile;
 
 public class RandomTypeMatchups {
-   public int basetypes[] = {0x00, 0x05, 0x05, 0x00, 0x08, 0x05, 0x0a, 0x0a, 0x05,
+   public byte basetypes[] = {0x00, 0x05, 0x05, 0x00, 0x08, 0x05, 0x0a, 0x0a, 0x05,
        0x0a, 0x0b, 0x05, 0x0a, 0x0c, 0x14, 0x0a, 0x0f, 0x14, 0x0a, 0x06, 0x14,
        0x0a, 0x05, 0x05, 0x0a, 0x10, 0x05, 0x0a, 0x08, 0x14, 0x0b, 0x0a, 0x14,
        0x0b, 0x0b, 0x05, 0x0b, 0x0c, 0x05, 0x0b, 0x04, 0x14, 0x0b, 0x05, 0x14,
@@ -59,9 +60,9 @@ public class RandomTypeMatchups {
       "Psychic", "Ice", "Dragon", "Dark"};
    private String types_abr[] = {"nor", "fig", "fly", "poi", "gro", "roc",
       "bug", "gho", "ste", "fir", "wat", "gra", "ele", "psy", "ice", "dra", "dar"};
-   private int type_table[] = {0,1,2,3,4,5,6,7,8,-1,9,10,11,12,13,14,15,16};
-   private int type_LUT[] = {0,1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17};
-   private int effec_table[] = {0, 5, 20};
+   private byte type_table[] = {0,1,2,3,4,5,6,7,8,-1,9,10,11,12,13,14,15,16};
+   private byte type_LUT[] = {0,1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17};
+   private byte effec_table[] = {0, 5, 20};
    private double deviation = .2;
    Random r;
    public RandomTypeMatchups(Random r) {
@@ -71,7 +72,7 @@ public class RandomTypeMatchups {
       this.r = new java.util.Random();
    }
 
-   public int[] randomTypes() {
+   public byte[] randomTypes() {
       //compute base distribution
       int[][][] count = {{new int[17], new int[17], new int[17]},
                         {new int[17], new int[17], new int[17]}};
@@ -89,15 +90,15 @@ public class RandomTypeMatchups {
          count[1][mult_index][type_table[basetypes[i+1]]]+=1;
       }
       //actually generate new matchups
-      int[] matchups = new int[basetypes.length+3];
+      byte[] matchups = new byte[basetypes.length+3];
 outerloop:
       for(int i=0;i<basetypes.length;i+=3) {
          int effi = pickWeighted(effec_sum, deviation/5);
          int ai = pickWeighted(count[0][effi], deviation);
-         int at = type_LUT[ai];
+         byte at = type_LUT[ai];
          int di = pickWeighted(count[1][effi], deviation);
-         int dt = type_LUT[di];
-         int eff = effec_table[effi];
+         byte dt = type_LUT[di];
+         byte eff = effec_table[effi];
 
          //Check and retry duplicates
          //Currently makes randomTypes() O(n^2), consider improved implementation.
@@ -126,8 +127,8 @@ outerloop:
       }
       if(end == basetypes.length)
          System.err.println("Warning, no ghost immunities generated. Foresight may break");
-      matchups[end] = 0xFE;
-      matchups[end+1] = 0xFE;
+      matchups[end] = (byte)-2;
+      matchups[end+1] = (byte)-2;
       matchups[end+2] = 0x00;
       return matchups;
    }
@@ -157,12 +158,12 @@ outerloop:
       return sums.length-1;
    }
    private char effec_char[] = {' ','0','-','+'};
-   public String formatChart(int[] matchups) {
+   public String formatChart(byte[] matchups) {
       String out="    ";
       int dim = 17;
       int table[] = new int[dim*dim];
       for(int i=0; i<matchups.length; i+=3) {
-         if(matchups[i] == 0xFE && matchups[i+1] == 0xFE)
+         if(matchups[i] == -2 && matchups[i+1] == -2)
             continue;
          int mult = matchups[i+2];
          int mult_index = 0;
@@ -202,7 +203,7 @@ outerloop:
          }
       }
       RandomTypeMatchups rtm = new RandomTypeMatchups(new Random());
-      int[] new_matchups = rtm.randomTypes();
+      byte[] new_matchups = rtm.randomTypes();
       System.out.println(rtm.formatChart(new_matchups));
       byte[] matchups_byte = new byte[new_matchups.length];
       for(int i=0;i<new_matchups.length;i++) {

@@ -62,6 +62,7 @@ import com.dabomstew.pkrandom.pokemon.MoveLearnt;
 import com.dabomstew.pkrandom.pokemon.Pokemon;
 import com.dabomstew.pkrandom.pokemon.Trainer;
 import com.dabomstew.pkrandom.pokemon.TrainerPokemon;
+import com.dabomstew.pkrandom.RandomTypeMatchups;
 
 public class Gen4RomHandler extends AbstractDSRomHandler {
 
@@ -1928,6 +1929,48 @@ public class Gen4RomHandler extends AbstractDSRomHandler {
     @Override
     public boolean canChangeStarters() {
         return true;
+    }
+    
+    @Override
+    public boolean canRandomizeMatchups() {
+       return romEntry.numbers.containsKey("TypeChartOffset") &&
+               romEntry.numbers.containsKey("TypeChartOvlNumber");
+    }
+    @Override
+    public void randomizeMatchups(final PrintStream log) {
+        try {
+            int overlay_number = romEntry.getInt("TypeChartOvlNumber");
+            byte[] overlay = readOverlay(overlay_number);
+            //TODO: store in config?
+            int tableOffset = romEntry.getInt("TypeChartOffset");
+            int n=tableOffset;
+            while(n+3<overlay.length) {
+                System.out.println(overlay[n]);
+                if(overlay[n] == -1 && overlay[n+1] == -1)
+                    break;
+                n+=3;
+            }
+            if (overlay[n] != -1) {
+                log.println("Failed to find end of existing type table");
+                return;
+            }
+            int len = n-tableOffset;
+            byte[] original_table = new byte[len];
+            System.arraycopy(overlay, tableOffset, original_table, 0, len);
+            //TODO: refactor to feed in original_table
+            //With some finagling, this would cleanly solve the problem of 
+            //reindexing types between generations
+            //Perhaps have foresight remove immunities from the
+            //type with the most immunities?
+            RandomTypeMatchups rtm = new RandomTypeMatchups(this.random);
+            byte matchups[] = rtm.randomTypes();
+            log.println(rtm.formatChart(matchups));
+            System.arraycopy(matchups, 0, overlay, tableOffset, matchups.length);
+            writeOverlay(overlay_number, overlay);
+            
+        } catch(IOException e) {
+            log.printf("failed to read or right overlay: %s\n", e.toString());
+        }
     }
 
     private void populateEvolutions() {

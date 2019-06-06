@@ -85,6 +85,11 @@ public class Randomizer {
         } else {
             romHandler.setPokemonPool(null);
         }
+        if (settings.doRandomizeMatchups()) {
+           //TODO: Consider arrangement. Probably do randomization outside of
+           //romhandler
+           romHandler.randomizeMatchups(log);
+        }
 
         // Move updates & data changes
         if (settings.isUpdateMoves()) {

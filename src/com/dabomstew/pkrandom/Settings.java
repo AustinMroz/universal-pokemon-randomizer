@@ -61,6 +61,7 @@ public class Settings {
     private boolean makeEvolutionsEasier;
     private boolean raceMode;
     private boolean blockBrokenMoves;
+    private boolean randomizeMatchups;
     private boolean limitPokemon;
 
     public enum BaseStatisticsMod {
@@ -264,7 +265,7 @@ public class Settings {
         // 2: pokemon types & more general options
         out.write(makeByteSelected(typesMod == TypesMod.RANDOM_FOLLOW_EVOLUTIONS,
                 typesMod == TypesMod.COMPLETELY_RANDOM, typesMod == TypesMod.UNCHANGED, raceMode, blockBrokenMoves,
-                limitPokemon));
+                limitPokemon, randomizeMatchups));
 
         // 3: v171: changed to the abilities byte
 
@@ -436,6 +437,7 @@ public class Settings {
         settings.setRaceMode(restoreState(data[2], 3));
         settings.setBlockBrokenMoves(restoreState(data[2], 4));
         settings.setLimitPokemon(restoreState(data[2], 5));
+        settings.setRandomizeMatchups(restoreState(data[2], 6));
 
         settings.setAbilitiesMod(restoreEnum(AbilitiesMod.class, data[3], 0, // UNCHANGED
                 1 // RANDOMIZE
@@ -806,6 +808,16 @@ public class Settings {
         this.blockBrokenMoves = blockBrokenMoves;
         return this;
     }
+
+    public boolean doRandomizeMatchups() {
+        return randomizeMatchups;
+    }
+
+    public Settings setRandomizeMatchups(boolean randomizeMatchups) {
+       this.randomizeMatchups = randomizeMatchups;
+       return this;
+    }
+
 
     public boolean isLimitPokemon() {
         return limitPokemon;

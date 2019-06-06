@@ -699,6 +699,8 @@ public class RandomizerGUI extends javax.swing.JFrame {
         this.raceModeCB.setSelected(false);
         this.brokenMovesCB.setEnabled(false);
         this.brokenMovesCB.setSelected(false);
+        this.randomizeMatchupsCB.setEnabled(false);
+        this.randomizeMatchupsCB.setSelected(false);
 
         this.riRomNameLabel.setText(bundle.getString("RandomizerGUI.noRomLoaded"));
         this.riRomCodeLabel.setText("");
@@ -1055,8 +1057,12 @@ public class RandomizerGUI extends javax.swing.JFrame {
             this.pokeLimitCB.setVisible(!(romHandler instanceof Gen1RomHandler || romHandler.isROMHack()));
             this.pokeLimitBtn.setVisible(!(romHandler instanceof Gen1RomHandler || romHandler.isROMHack()));
 
-            this.brokenMovesCB.setSelected(false);
-            this.brokenMovesCB.setEnabled(true);
+            if (romHandler.canRandomizeMatchups()) {
+                this.brokenMovesCB.setEnabled(true);
+            }
+
+            this.randomizeMatchupsCB.setSelected(false);
+            this.randomizeMatchupsCB.setEnabled(true);
 
             this.loadQSButton.setEnabled(true);
             this.saveQSButton.setEnabled(true);
@@ -1659,6 +1665,7 @@ public class RandomizerGUI extends javax.swing.JFrame {
         this.ptUnchangedRB.setSelected(settings.getTypesMod() == Settings.TypesMod.UNCHANGED);
         this.raceModeCB.setSelected(settings.isRaceMode());
         this.brokenMovesCB.setSelected(settings.doBlockBrokenMoves());
+        this.randomizeMatchupsCB.setSelected(settings.doRandomizeMatchups());
         this.pokeLimitCB.setSelected(settings.isLimitPokemon());
 
         this.goCondenseEvosCheckBox.setSelected(settings.isMakeEvolutionsEasier());
@@ -1820,6 +1827,7 @@ public class RandomizerGUI extends javax.swing.JFrame {
                 ptRandomTotalRB.isSelected());
         settings.setRaceMode(raceModeCB.isSelected());
         settings.setBlockBrokenMoves(brokenMovesCB.isSelected());
+        settings.setRandomizeMatchups(randomizeMatchupsCB.isSelected());
         settings.setLimitPokemon(pokeLimitCB.isSelected());
 
         settings.setMakeEvolutionsEasier(goCondenseEvosCheckBox.isSelected());
