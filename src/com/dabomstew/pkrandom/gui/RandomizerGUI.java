@@ -2582,7 +2582,7 @@ public class RandomizerGUI extends javax.swing.JFrame {
         pokeLimitBtn = new javax.swing.JButton();
         raceModeCB = new javax.swing.JCheckBox();
         brokenMovesCB = new javax.swing.JCheckBox();
-        RandomizeMatchupsCB = new javax.swing.JCheckBox();
+        randomizeMatchupsCB = new javax.swing.JCheckBox();
         romInfoPanel = new javax.swing.JPanel();
         riRomNameLabel = new javax.swing.JLabel();
         riRomCodeLabel = new javax.swing.JLabel();
@@ -2808,8 +2808,8 @@ public class RandomizerGUI extends javax.swing.JFrame {
         brokenMovesCB.setText(bundle.getString("RandomizerGUI.brokenMovesCB.text")); // NOI18N
         brokenMovesCB.setToolTipText(bundle.getString("RandomizerGUI.brokenMovesCB.toolTipText")); // NOI18N
 
-        RandomizeMatchupsCB.setText(bundle.getString("RandomizerGUI.RandomizeMatchupsCB.text")); // NOI18N
-        RandomizeMatchupsCB.setToolTipText(bundle.getString("RandomizerGUI.RandomizeMatchupsCB.toolTipText")); // NOI18N
+        randomizeMatchupsCB.setText(bundle.getString("RandomizerGUI.randomizeMatchupsCB.text")); // NOI18N
+        randomizeMatchupsCB.setToolTipText(bundle.getString("RandomizerGUI.randomizeMatchupsCB.toolTipText")); // NOI18N
 
 
         javax.swing.GroupLayout generalOptionsPanelLayout = new javax.swing.GroupLayout(generalOptionsPanel);
@@ -2825,7 +2825,7 @@ public class RandomizerGUI extends javax.swing.JFrame {
                         .addComponent(pokeLimitBtn))
                     .addComponent(raceModeCB)
                     .addComponent(brokenMovesCB)
-                    .addComponent(RandomizeMatchupsCB))
+                    .addComponent(randomizeMatchupsCB))
                 .addContainerGap(22, Short.MAX_VALUE))
         );
         generalOptionsPanelLayout.setVerticalGroup(
@@ -2840,7 +2840,7 @@ public class RandomizerGUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(brokenMovesCB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RandomizeMatchupsCB)
+                .addComponent(randomizeMatchupsCB)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -4633,7 +4633,7 @@ public class RandomizerGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox RandomizeMatchupsCB;
+    private javax.swing.JCheckBox randomizeMatchupsCB;
     private javax.swing.JPanel abilitiesPanel;
     private javax.swing.JPanel baseStatsPanel;
     private javax.swing.JCheckBox brokenMovesCB;

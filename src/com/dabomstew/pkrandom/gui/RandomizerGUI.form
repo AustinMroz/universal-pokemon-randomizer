@@ -239,7 +239,7 @@
                       </Group>
                       <Component id="raceModeCB" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="brokenMovesCB" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="RandomizeMatchupsCB" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="randomizeMatchupsCB" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="22" max="32767" attributes="0"/>
               </Group>
@@ -258,7 +258,7 @@
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="brokenMovesCB" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="RandomizeMatchupsCB" min="-2" max="-2" attributes="0"/>
+                  <Component id="randomizeMatchupsCB" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -308,13 +308,13 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="RandomizeMatchupsCB">
+        <Component class="javax.swing.JCheckBox" name="randomizeMatchupsCB">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/dabomstew/pkrandom/gui/Bundle.properties" key="RandomizerGUI.RandomizeMatchupsCB.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="com/dabomstew/pkrandom/gui/Bundle.properties" key="RandomizerGUI.randomizeMatchupsCB.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="com/dabomstew/pkrandom/gui/Bundle.properties" key="RandomizerGUI.RandomizeMatchupsCB.toolTipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="com/dabomstew/pkrandom/gui/Bundle.properties" key="RandomizerGUI.randomizeMatchupsCB.toolTipText" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
         </Component>
